@@ -35,7 +35,6 @@ const fases = [
     titulo: "ETAPA 1: MEDO",
     enigma:
       "Tentei me esconder do Lobo-Guará em um quarto com guarda-roupas",
-    
     instrucao: "Insira aqui sua resposta",
     respostaCorreta: "SOS",
     corRecompensaHex: "#FF0000",
