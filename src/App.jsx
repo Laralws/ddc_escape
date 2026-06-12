@@ -32,13 +32,14 @@ const fontLink = `
 const fases = [
   {
     id: 1,
-    titulo: "ETAPA 1: O DESAPARECIMENTO",
+    titulo: "ETAPA 1: MEDO",
     enigma:
-      "O repórter desapareceu na mesma noite em que o sinal da torre foi cortado. Ele deixou apenas uma palavra rabiscada no caderno encontrado na mesa: a cor que represents a natureza, o começo e o dado ainda não corrompido. Qual é essa cor?",
+      "Tentei me esconder do Lobo-Guará em um quarto com guarda-roupas",
+    dica: "Deixei rastros em lugares que tentei me esconder do Lobo-Guará.",
     instrucao: "Insira aqui sua resposta",
-    respostaCorreta: "verde",
-    corRecompensaHex: "#29FF14",
-    corRecompensaNome: "VERDE",
+    respostaCorreta: "SOS",
+    corRecompensaHex: "#FF0000",
+    corRecompensaNome: "VERMELHO",
   },
   {
     id: 2,
