@@ -1,11 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from "react";
-
-/* ─────────────────────────────────────────
-   CONFIGURAÇÃO GLOBAL DO TIMER (18 minutos)
-─────────────────────────────────────────── */
-const TEMPO_TOTAL_SEGUNDOS = 18 * 60; 
+import { useState, useCallback } from "react";
 
 const fontLink = `
   @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Courier+Prime:ital,wght@0,400;0,700;1,400&family=Inter:wght@400;500;600&display=swap');
@@ -13,7 +8,7 @@ const fontLink = `
   html, body {
     margin: 0;
     padding: 0;
-    background-color: #121212;
+    background-color: #0A1128;
     color: #FFF;
     width: 100%;
     min-height: 100vh;
@@ -33,6 +28,7 @@ const fases = [
     id: 1,
     titulo: "ETAPA 1: MEDO",
     enigma: "Tentei me esconder do Lobo-Guará em um quarto com guarda-roupas",
+    infoExtra: "Deixei alguns vestígios nos lugares que tentei me esconder do Lobo-Guará.",
     instrucao: "Insira aqui sua resposta",
     respostaCorreta: "SOS",
     corRecompensaHex: "#FF0000",
@@ -40,146 +36,50 @@ const fases = [
   },
   {
     id: 2,
-    titulo: "ETAPA 2: A PISTA NO AR",
+    titulo: "ETAPA 2: REGREDIR PARA DEPOIS AVANÇAR",
     enigma:
-      "Nas frequências criptografadas do DDC, um analista captou uma transmissão codificada. A mensagem dizia: 'Procure o elemento que aparece quando a luz encontra a chuva — não o arco-íris inteiro, apenas a cor que está sempre no centro, entre o quente e o frio.' Qual é essa cor?",
+      "Tentei fugir, mas não conseguir. Então tentei me esconder na piscina. ",
+    infoExtra: "Dica: O espectro visível segue uma ordem específica de temperaturas de cor.",
     instrucao: "Insira aqui sua resposta",
     respostaCorreta: "verde",
-    corRecompensaHex: "#00FF88",
-    corRecompensaNome: "VERDE CIANO",
-  },
-  {
-    id: 3,
-    titulo: "ETAPA 3: O ARQUIVO PROIBIDO",
-    enigma:
-      "No servidor offline do DDC, um arquivo protegido foi encontrado. A senha era um conceito: 'a cor do perigo, do alerta máximo, do sangue que corre quando a truth é revelada.' Apenas uma palavra abre esse arquivo. Qual cor é essa?",
-    instrucao: "Insira aqui sua resposta",
-    respostaCorreta: "vermelho",
-    corRecompensaHex: "#FF2020",
-    corRecompensaNome: "VERMELHO",
-  },
-  {
-    id: 4,
-    titulo: "ETAPA 4: A IDENTIDADE OCULTA",
-    enigma:
-      "A fonte anônima deixou um bilhete: 'Sou a cor do céu antes da tempestade, da frieza das telas e dos sistemas que nunca dormem. Encontre-me no monitor aceso às 3h da manhã.' Qual é a minha cor?",
-    instrucao: "Insira aqui sua resposta",
-    respostaCorreta: "azul",
     corRecompensaHex: "#1E90FF",
     corRecompensaNome: "AZUL",
   },
   {
-    id: 5,
-    titulo: "ETAPA 5: O PROTOCOLO FINAL",
+    id: 3,
+    titulo: "ETAPA 3: NEM TUDO É O QUE PARECE",
     enigma:
-      "O Diário de Caça chegou ao fim — ou ao início? O código final estava escondido na edição impressa, na tinta que preenche cada página, no tom que une todas as pistas anteriores numa única sombra. A cor que tudo absorve e nada reflete. Qual cor é essa?",
+      "Último lugar pelo qual passei tinham algumas cadeiras com mesa de centro e uma porta que levava para fora da casa.",
+    infoExtra: "Escondi uma mensagem no meio da conversa de algumas pessoas que estavam por aqui.",
     instrucao: "Insira aqui sua resposta",
-    respostaCorreta: "preto",
-    corRecompensaHex: "#8B5CF6",
-    corRecompensaNome: "VIOLETA",
+    respostaCorreta: "CONTINUE",
+    corRecompensaHex: "#ffe920ff",
+    corRecompensaNome: "AMARELO",
   },
 ];
 
-function formatarTempo(segundos) {
-  const m = Math.floor(segundos / 60);
-  const s = segundos % 60;
-  return `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
-}
-
-/* ─────────────────────────────────────────
-   CRONÔMETRO — CENTRALIZADO E GRANDE
-─────────────────────────────────────────── */
-function Cronometro({ tempoRestante }) {
-  const critico = tempoRestante <= 60;
-  const cor = critico ? "#FF3B3B" : "#D1FFC2"; 
-
-  return (
-    <div style={{
-      display: "flex",
-      justifyContent: "center",
-      width: "100%",
-      margin: "0.5rem 0 1.5rem 0"
-    }}>
-      <div style={{
-        background: "#0F0F0F",
-        border: "2px solid #222",
-        padding: "0.6rem 2.5rem",
-        display: "inline-block",
-        position: "relative",
-        boxShadow: "inset 0 0 10px rgba(0,0,0,0.8)"
-      }}>
-        <span style={{ position: "absolute", top: 4, left: 4, width: 3, height: 3, background: "#333" }} />
-        <span style={{ position: "absolute", top: 4, right: 4, width: 3, height: 3, background: "#333" }} />
-        <span style={{ position: "absolute", bottom: 4, left: 4, width: 3, height: 3, background: "#333" }} />
-        <span style={{ position: "absolute", bottom: 4, right: 4, width: 3, height: 3, background: "#333" }} />
-
-        <p style={{
-          fontFamily: "'JetBrains Mono', monospace",
-          fontSize: "2.4rem",
-          fontWeight: "700",
-          color: cor,
-          margin: 0,
-          letterSpacing: "0.05em",
-          lineHeight: 1,
-          textShadow: critico ? "0 0 10px rgba(255,59,59,0.5)" : "0 0 12px rgba(41,255,20,0.4)"
-        }}>
-          {formatarTempo(tempoRestante)}
-        </p>
-      </div>
-    </div>
-  );
-}
-
-/* ─────────────────────────────────────────
-   TELA: TEMPO ESGOTADO
-─────────────────────────────────────────── */
-function TelaTimeOut({ onReiniciar }) {
-  return (
-    <>
-      <style>{fontLink}</style>
-      <div style={{
-        minHeight: "100vh", background: "#0A0A0A", width: "100vw",
-        display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
-        padding: "1.5rem", fontFamily: "'JetBrains Mono', monospace", boxSizing: "border-box"
-      }}>
-        <div style={{ width: "100%", maxWidth: "26rem", border: "1px solid #6B0000", background: "#121212", padding: "2rem 1.5rem", textAlign: "center" }}>
-          <h1 style={{ fontSize: "1.2rem", color: "#FF2020", margin: "0 0 1rem 0" }}>⚠️ PROTOCOLO FALHOU</h1>
-          <p style={{ fontFamily: "'Courier Prime', monospace", fontSize: "0.9rem", color: "#666", lineHeight: 1.6, marginBottom: "2rem" }}>
-            O tempo limite expirou. O sistema limpou os logs do Diário de Caça e bloqueou este terminal.
-          </p>
-          <button onClick={onReiniciar} style={{
-            width: "100%", padding: "0.85rem", background: "transparent", color: "#FF2020", border: "1px solid #6B0000",
-            fontFamily: "'JetBrains Mono', monospace", fontSize: "0.75rem", fontWeight: 700, cursor: "pointer",
-          }}> REINICIAR TERMINAL </button>
-        </div>
-      </div>
-    </>
-  );
-}
 
 /* ─────────────────────────────────────────
    TELA FINAL (Vitória)
 ─────────────────────────────────────────── */
-function TelaFinal({ tempoRestante, total }) {
-  const tempoUsado = total - tempoRestante;
+function TelaFinal() {
   return (
     <div style={{
-      minHeight: "100vh", background: "#0A0A0A", width: "100vw",
+      minHeight: "100vh", background: "#050914", width: "100vw",
       display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
       padding: "1.5rem", fontFamily: "'JetBrains Mono', monospace", boxSizing: "border-box"
     }}>
-      <div style={{ width: "100%", maxWidth: "26rem", border: "1px solid #29FF14", background: "#121212", padding: "2rem 1.5rem", textAlign: "center" }}>
-        <h1 style={{ fontSize: "1.2rem", color: "#29FF14", margin: "0 0 1.5rem 0" }}>🔓 ACESSO CONCEDIDO</h1>
-        <p style={{ fontFamily: "'Courier Prime', monospace", fontSize: "0.9rem", color: "#888", lineHeight: 1.6, marginBottom: "1.5rem" }}>
-          A sequência criptográfica do Diário de Caça foi estabilizada. O isolamento do Setor 07 foi levantado com sucesso.
+      <div style={{ width: "100%", maxWidth: "26rem", border: "1px solid #FFB800", background: "#0A1128", padding: "2rem 1.5rem", textAlign: "center" }}>
+        <h1 style={{ fontSize: "1.2rem", color: "#FFB800", margin: "0 0 1.5rem 0" }}>⚠️ SEQUÊNCIA ENCONTRADA</h1>
+        <p style={{ fontFamily: "'Courier Prime', monospace", fontSize: "0.9rem", color: "#8892B0", lineHeight: 1.6, marginBottom: "1.5rem" }}>
+          A sequência de cores foi identificada, mas a cela do Lobo Autor continua trancada. Guarde essa combinação para colocar no sistema principal.
         </p>
-        <div style={{ background: "#161616", border: "1px solid #2E2E2E", padding: "0.75rem 1rem", marginBottom: "1.5rem", fontSize: "0.7rem", color: "#555", display: "flex", justifyContent: "space-between" }}>
-          <span>TEMPO ATIVO: {formatarTempo(tempoUsado)}</span>
-          <span style={{ color: "#29FF14" }}>SINCRONIZADO</span>
+        <div style={{ background: "#111A3A", border: "1px solid #1E2A5E", padding: "0.75rem 1rem", marginBottom: "1.5rem", fontSize: "0.7rem", color: "#8892B0", display: "flex", justifyContent: "center" }}>
+          <span style={{ color: "#FFB800" }}>COLOQUEM A SEQUÊNCIA DE CORES NO SISTEMA PRINCIPAL</span>
         </div>
         <div style={{ display: "flex", gap: "0.4rem", justifyContent: "center" }}>
           {fases.map((f) => (
-            <div key={f.id} style={{ width: 24, height: 24, background: f.corRecompensaHex, border: "1px solid #222" }} />
+            <div key={f.id} style={{ width: 24, height: 24, background: f.corRecompensaHex, border: "1px solid #1E2A5E" }} />
           ))}
         </div>
       </div>
@@ -193,21 +93,21 @@ function TelaFinal({ tempoRestante, total }) {
 function CardConclusao({ fase, onAvancar, ultima }) {
   return (
     <div style={{
-      position: "fixed", inset: 0, background: "rgba(0,0,0,0.9)",
+      position: "fixed", inset: 0, background: "rgba(5, 9, 20, 0.9)",
       display: "flex", alignItems: "center", justifyContent: "center", padding: "1.5rem", zIndex: 50,
     }}>
       <div style={{
-        width: "100%", maxWidth: "22rem", background: "#121212", border: "1px solid #29FF14", padding: "2rem 1.5rem", textAlign: "center",
+        width: "100%", maxWidth: "22rem", background: "#0A1128", border: "1px solid #FFB800", padding: "2rem 1.5rem", textAlign: "center",
       }}>
-        <div style={{ fontSize: "0.7rem", color: "#29FF14", fontFamily: "'JetBrains Mono', monospace", marginBottom: "1.5rem", letterSpacing: "0.1em" }}>
+        <div style={{ fontSize: "0.7rem", color: "#FFB800", fontFamily: "'JetBrains Mono', monospace", marginBottom: "1.5rem", letterSpacing: "0.1em" }}>
           [✓] SETOR_RESTRITO_LIBERADO
         </div>
-        <div style={{ width: 60, height: 60, background: fase.corRecompensaHex, margin: "0 auto 1rem", border: "1px solid #222" }} />
+        <div style={{ width: 60, height: 60, background: fase.corRecompensaHex, margin: "0 auto 1rem", border: "1px solid #1E2A5E" }} />
         <p style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: "0.9rem", color: "#FFF", margin: "0 0 2rem 0", letterSpacing: "0.1em" }}>
           {fase.corRecompensaNome}
         </p>
         <button onClick={onAvancar} style={{
-          width: "100%", padding: "0.85rem", background: "#29FF14", color: "#000", border: "none",
+          width: "100%", padding: "0.85rem", background: "#FFB800", color: "#000", border: "none",
           fontFamily: "'JetBrains Mono', monospace", fontSize: "0.75rem", fontWeight: 700, cursor: "pointer",
         }}>
           {ultima ? "COMPLETAR DIÁRIO →" : "PRÓXIMO SETOR →"}
@@ -220,7 +120,7 @@ function CardConclusao({ fase, onAvancar, ultima }) {
 /* ─────────────────────────────────────────
    TELA DE FASE (Dashboard Principal)
 ─────────────────────────────────────────── */
-function TelaFase({ fase, faseIndex, total, onAvancar, tempoRestante, totalTempo }) {
+function TelaFase({ fase, faseIndex, total, onAvancar }) {
   const [resposta, setResposta]   = useState("");
   const [erro, setErro]           = useState(false);
   const [acerto, setAcerto]       = useState(false);
@@ -248,7 +148,7 @@ function TelaFase({ fase, faseIndex, total, onAvancar, tempoRestante, totalTempo
       `}</style>
 
       <div style={{
-        minHeight: "100vh", background: "#121212", color: "#FFF",
+        minHeight: "100vh", background: "#0A1128", color: "#FFF",
         fontFamily: "'JetBrains Mono', monospace", padding: "1.5rem 1rem",
         display: "flex", flexDirection: "column", alignItems: "center",
         width: "100vw", boxSizing: "border-box"
@@ -256,18 +156,15 @@ function TelaFase({ fase, faseIndex, total, onAvancar, tempoRestante, totalTempo
         <div style={{ width: "100%", maxWidth: "26rem" }}>
 
           {/* Header Superior Metadados */}
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.75rem", fontSize: "0.65rem", color: "#444" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.75rem", fontSize: "0.65rem", color: "#8892B0" }}>
             <span>DIÁRIO DE CAÇA // OBSIDIAN PROTOCOL</span>
-            <span style={{ color: "#29FF14" }}>{faseIndex}/{total}</span>
+            <span style={{ color: "#FFB800" }}>{faseIndex}/{total}</span>
           </div>
 
           {/* Barra de Progresso do Topo */}
-          <div style={{ height: 2, background: "#2A2A2A", marginBottom: "1.5rem", overflow: "hidden" }}>
-            <div style={{ height: "100%", width: `${progresso}%`, background: "#29FF14", transition: "width 0.5s ease" }} />
+          <div style={{ height: 2, background: "#1E2A5E", marginBottom: "1.5rem", overflow: "hidden" }}>
+            <div style={{ height: "100%", width: `${progresso}%`, background: "#FFB800", transition: "width 0.5s ease" }} />
           </div>
-
-          {/* Cronômetro Centralizado e Grande */}
-          <Cronometro tempoRestante={tempoRestante} total={totalTempo} />
 
           {/* Título da Etapa */}
           <h2 style={{
@@ -276,17 +173,17 @@ function TelaFase({ fase, faseIndex, total, onAvancar, tempoRestante, totalTempo
           }}>
             {fase.titulo}
           </h2>
-          <p style={{ fontSize: "0.6rem", color: "#444", margin: "0 0 1.25rem 0", letterSpacing: "0.1em" }}>
+          <p style={{ fontSize: "0.6rem", color: "#8892B0", margin: "0 0 1.25rem 0", letterSpacing: "0.1em" }}>
             SECTOR_0{fase.id}_ESCAPE // ETAPA 0{fase.id}
           </p>
 
           {/* Bloco de Enigma */}
           <div style={{
-            background: "#161616", border: "1px solid #2E2E2E",
+            background: "#111A3A", border: "1px solid #1E2A5E",
             padding: "1.25rem", marginBottom: "1.25rem"
           }}>
-            <p style={{ fontSize: "0.6rem", color: "#29FF14", margin: "0 0 0.75rem 0", letterSpacing: "0.05em" }}>
-              › TRANSMISSÃO INTERCEPTADA
+            <p style={{ fontSize: "0.6rem", color: "#FFB800", margin: "0 0 0.75rem 0", letterSpacing: "0.05em" }}>
+              › LOCALIZAÇÃO
             </p>
             <p style={{
               fontFamily: "'Courier Prime', monospace", fontSize: "0.9rem",
@@ -295,6 +192,24 @@ function TelaFase({ fase, faseIndex, total, onAvancar, tempoRestante, totalTempo
               {fase.enigma}
             </p>
           </div>
+
+          {/* Bloco de Informação Extra */}
+          {fase.infoExtra && (
+            <div style={{
+              background: "#111A3A", border: "1px solid #1E2A5E",
+              padding: "1.25rem", marginBottom: "1.25rem"
+            }}>
+              <p style={{ fontSize: "0.6rem", color: "#FFB800", margin: "0 0 0.75rem 0", letterSpacing: "0.05em" }}>
+                › DADOS ADICIONAIS
+              </p>
+              <p style={{
+                fontFamily: "'Courier Prime', monospace", fontSize: "0.9rem",
+                color: "#BCBCBC", lineHeight: 1.6, margin: 0
+              }}>
+                {fase.infoExtra}
+              </p>
+            </div>
+          )}
 
           {/* Alerta de erro piscando */}
           {erro && (
@@ -312,8 +227,8 @@ function TelaFase({ fase, faseIndex, total, onAvancar, tempoRestante, totalTempo
           )}
 
           {/* Caixa de Entrada e Botão Completamente Retos */}
-          <div style={{ background: "#161616", border: "1px solid #2E2E2E", padding: "1.25rem" }}>
-            <label style={{ display: "block", fontSize: "0.6rem", color: "#444", marginBottom: "0.5rem", letterSpacing: "0.05em" }}>
+          <div style={{ background: "#111A3A", border: "1px solid #1E2A5E", padding: "1.25rem" }}>
+            <label style={{ display: "block", fontSize: "0.6rem", color: "#8892B0", marginBottom: "0.5rem", letterSpacing: "0.05em" }}>
               › {fase.instrucao.toUpperCase()}
             </label>
             <input
@@ -325,13 +240,13 @@ function TelaFase({ fase, faseIndex, total, onAvancar, tempoRestante, totalTempo
               autoComplete="off" autoCorrect="off" spellCheck={false}
               style={{
                 width: "100%", boxSizing: "border-box", padding: "0.75rem",
-                background: "#0F0F0F", border: "1px solid #2E2E2E",
+                background: "#050914", border: "1px solid #1E2A5E",
                 fontFamily: "'JetBrains Mono', monospace", fontSize: "0.85rem", color: "#FFF",
                 outline: "none", marginBottom: "0.75rem"
               }}
             />
             <button onClick={handleEnviar} style={{
-              width: "100%", padding: "0.8rem", background: "#29FF14", color: "#000",
+              width: "100%", padding: "0.8rem", background: "#FFB800", color: "#000",
               border: "none", fontFamily: "'JetBrains Mono', monospace",
               fontSize: "0.75rem", fontWeight: 700, letterSpacing: "0.1em", cursor: "pointer"
             }}>
@@ -353,108 +268,21 @@ function TelaFase({ fase, faseIndex, total, onAvancar, tempoRestante, totalTempo
   );
 }
 
-/* ─────────────────────────────────────────
-   TELA DE INTRODUÇÃO (A Carta)
-─────────────────────────────────────────── */
-function TelaIntro({ onIniciar }) {
-  return (
-    <>
-      <style>{fontLink}</style>
-      <div style={{
-        minHeight: "100vh", background: "#121212", color: "#FFF", width: "100vw",
-        display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
-        padding: "1.5rem", fontFamily: "'JetBrains Mono', monospace", boxSizing: "border-box"
-      }}>
-        <div style={{ width: "100%", maxWidth: "24rem", border: "1px solid #2E2E2E", background: "#161616", padding: "1.75rem" }}>
-          <div style={{ fontSize: "0.65rem", color: "#29FF14", marginBottom: "1rem" }}>
-            // PROTOCOLO_OBSIDIAN.SYS
-          </div>
-          <h1 style={{ fontSize: "1.3rem", fontWeight: 700, margin: "0 0 1rem 0", letterSpacing: "0.05em" }}>
-            DIÁRIO DE CAÇA
-          </h1>
-          <p style={{ fontFamily: "'Courier Prime', monospace", fontSize: "0.88rem", color: "#888", lineHeight: 1.7, margin: "0 0 1.5rem 0" }}>
-            Se você está lendo isso, o system foi comprometido. Não temos muito tempo. Eles já detectaram o vazamento de dados. 
-            Decifre as 5 credenciais fragmentadas nas páginas do jornal antes que eles nos desliguem.
-          </p>
-          <div style={{ fontSize: "0.7rem", color: "#FFB800", marginBottom: "1.5rem", letterSpacing: "0.05em" }}>
-            ⏱️ JANELA DE TEMPO EXTREMA: {formatarTempo(TEMPO_TOTAL_SEGUNDOS)} MINUTOS
-          </div>
-          <button onClick={onIniciar} style={{
-            width: "100%", padding: "0.85rem", background: "transparent", color: "#29FF14", border: "1px solid #29FF14",
-            fontFamily: "'JetBrains Mono', monospace", fontSize: "0.75rem", fontWeight: 700, cursor: "pointer"
-          }}>
-            INICIAR DESAFIO →
-          </button>
-        </div>
-      </div>
-    </>
-  );
-}
 
 /* ─────────────────────────────────────────
    COMPONENTE RAIZ
 ─────────────────────────────────────────── */
 export default function EscapeRoom() {
-  const [estado, setEstado]               = useState(null);
-  const [tempoRestante, setTempoRestante] = useState(TEMPO_TOTAL_SEGUNDOS);
-  const [tempoFinal, setTempoFinal]       = useState(null); 
-  const timerRef                          = useRef(null);
-
-  const pararTimer = useCallback(() => {
-    if (timerRef.current) {
-      clearInterval(timerRef.current);
-      timerRef.current = null;
-    }
-  }, []);
-
-  useEffect(() => {
-    if (typeof estado !== "number") return;
-
-    timerRef.current = setInterval(() => {
-      setTempoRestante((prev) => {
-        if (prev <= 1) {
-          pararTimer();
-          setEstado("timeout");
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-
-    return () => pararTimer();
-  }, [estado, pararTimer]);
-
-  const handleIniciar = () => {
-    setTempoRestante(TEMPO_TOTAL_SEGUNDOS);
-    setTempoFinal(null);
-    setEstado(0);
-  };
-
-  const handleReiniciar = () => {
-    pararTimer();
-    setTempoRestante(TEMPO_TOTAL_SEGUNDOS);
-    setTempoFinal(null);
-    setEstado(null);
-  };
+  const [estado, setEstado] = useState(0);
 
   const handleAvancar = useCallback(() => {
     setEstado((prev) => {
       if (typeof prev === "number" && prev < fases.length - 1) return prev + 1;
-      pararTimer();
       return "fim";
     });
-  }, [pararTimer]);
-
-  useEffect(() => {
-    if (estado === "fim" && tempoFinal === null) {
-      setTempoFinal(tempoRestante);
-    }
-  }, [estado, tempoRestante, tempoFinal]);
-
-  if (estado === null)      return <TelaIntro onIniciar={handleIniciar} />;
-  if (estado === "timeout") return <TelaTimeOut onReiniciar={handleReiniciar} />;
+  }, []);
   if (estado === "fim") {
-    return <TelaFinal tempoRestante={tempoFinal ?? tempoRestante} total={TEMPO_TOTAL_SEGUNDOS} />;
+    return <TelaFinal />;
   }
 
   return (
@@ -464,8 +292,6 @@ export default function EscapeRoom() {
       faseIndex={estado + 1}
       total={fases.length}
       onAvancar={handleAvancar}
-      tempoRestante={tempoRestante}
-      totalTempo={TEMPO_TOTAL_SEGUNDOS}
     />
   );
 }
