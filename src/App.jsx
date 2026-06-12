@@ -36,7 +36,7 @@ const fases = [
     enigma:
       "Tentei me esconder do Lobo-Guará em um quarto com guarda-roupas",
     dica: "Deixei rastros em lugares que tentei me esconder do Lobo-Guará.",
-    instrucao: "Insira aqui sua resposta",
+    
     respostaCorreta: "SOS",
     corRecompensaHex: "#FF0000",
     corRecompensaNome: "VERMELHO",
