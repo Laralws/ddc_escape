@@ -3,14 +3,13 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 
 /* ─────────────────────────────────────────
-   CONFIGURAÇÃO GLOBAL DO TIMER (5 minutos)
+   CONFIGURAÇÃO GLOBAL DO TIMER (18 minutos)
 ─────────────────────────────────────────── */
-const TEMPO_TOTAL_SEGUNDOS = 5 * 60; 
+const TEMPO_TOTAL_SEGUNDOS = 18 * 60; 
 
 const fontLink = `
   @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Courier+Prime:ital,wght@0,400;0,700;1,400&family=Inter:wght@400;500;600&display=swap');
   
-  /* Reset global para eliminar bordas brancas no mobile */
   html, body {
     margin: 0;
     padding: 0;
@@ -34,7 +33,7 @@ const fases = [
     id: 1,
     titulo: "ETAPA 1: O DESAPARECIMENTO",
     enigma:
-      "O repórter desapareceu na mesma noite em que o sinal da torre foi cortado. Ele deixou apenas uma palavra rabiscada no caderno encontrado na mesa: a cor que represents a natureza, o começo e o dado ainda não corrompido. Qual é essa cor?",
+      "O repórter desapareceu na mesma noite em que o sinal da torre foi cortado. Ele deixou apenas uma palavra rabiscada no caderno encontrado na mesa: a cor que representa a natureza, o começo e o dado ainda não corrompido. Qual é essa cor?",
     instrucao: "Insira aqui sua resposta",
     respostaCorreta: "verde",
     corRecompensaHex: "#29FF14",
@@ -44,7 +43,7 @@ const fases = [
     id: 2,
     titulo: "ETAPA 2: A PISTA NO AR",
     enigma:
-      "Nas frequências criptografadas do DDC, um analista captou uma transmission codificada. A mensagem dizia: 'Procure o elemento que aparece quando a luz encontra a chuva — não o arco-íris inteiro, apenas a cor que está sempre no centro, entre o quente e o frio.' Qual é essa cor?",
+      "Nas frequências criptografadas do DDC, um analista captou uma transmissão codificada. A mensagem dizia: 'Procure o elemento que aparece quando a luz encontra a chuva — não o arco-íris inteiro, apenas a cor que está sempre no centro, entre o quente e o frio.' Qual é essa cor?",
     instrucao: "Insira aqui sua resposta",
     respostaCorreta: "verde",
     corRecompensaHex: "#00FF88",
@@ -54,7 +53,7 @@ const fases = [
     id: 3,
     titulo: "ETAPA 3: O ARQUIVO PROIBIDO",
     enigma:
-      "No servidor offline do DDC, um arquivo protegido foi encontrado. A senha era um conceito: 'a cor do perigo, do alerta máximo, do sangue que corre quando a verdade é revelada.' Apenas uma palavra abre esse arquivo. Qual cor é essa?",
+      "No servidor offline do DDC, um arquivo protegido foi encontrado. A senha era um conceito: 'a cor do perigo, do alerta máximo, do sangue que corre quando a truth é revelada.' Apenas uma palavra abre esse arquivo. Qual cor é essa?",
     instrucao: "Insira aqui sua resposta",
     respostaCorreta: "vermelho",
     corRecompensaHex: "#FF2020",
@@ -89,7 +88,7 @@ function formatarTempo(segundos) {
 }
 
 /* ─────────────────────────────────────────
-   CRONÔMETRO — CENTRALIZADO E GRANDE (Estilo Caixa LED do Stitch)
+   CRONÔMETRO — CENTRALIZADO E GRANDE
 ─────────────────────────────────────────── */
 function Cronometro({ tempoRestante }) {
   const critico = tempoRestante <= 60;
@@ -147,7 +146,7 @@ function TelaTimeOut({ onReiniciar }) {
         <div style={{ width: "100%", maxWidth: "26rem", border: "1px solid #6B0000", background: "#121212", padding: "2rem 1.5rem", textAlign: "center" }}>
           <h1 style={{ fontSize: "1.2rem", color: "#FF2020", margin: "0 0 1rem 0" }}>⚠️ PROTOCOLO FALHOU</h1>
           <p style={{ fontFamily: "'Courier Prime', monospace", fontSize: "0.9rem", color: "#666", lineHeight: 1.6, marginBottom: "2rem" }}>
-            O tempo limite de 5 minutes expirou. O sistema limpou os logs do Diário de Caça e bloqueou este terminal.
+            O tempo limite expirou. O sistema limpou os logs do Diário de Caça e bloqueou este terminal.
           </p>
           <button onClick={onReiniciar} style={{
             width: "100%", padding: "0.85rem", background: "transparent", color: "#FF2020", border: "1px solid #6B0000",
@@ -375,11 +374,11 @@ function TelaIntro({ onIniciar }) {
             DIÁRIO DE CAÇA
           </h1>
           <p style={{ fontFamily: "'Courier Prime', monospace", fontSize: "0.88rem", color: "#888", lineHeight: 1.7, margin: "0 0 1.5rem 0" }}>
-            Se você está lendo isso, o sistema foi comprometido. Não temos muito tempo. Eles já detectaram o vazamento de dados. 
+            Se você está lendo isso, o system foi comprometido. Não temos muito tempo. Eles já detectaram o vazamento de dados. 
             Decifre as 5 credenciais fragmentadas nas páginas do jornal antes que eles nos desliguem.
           </p>
           <div style={{ fontSize: "0.7rem", color: "#FFB800", marginBottom: "1.5rem", letterSpacing: "0.05em" }}>
-            ⏱️ JANELA DE TEMPO EXTREMA: 05:00 MINUTOS
+            ⏱️ JANELA DE TEMPO EXTREMA: {formatarTempo(TEMPO_TOTAL_SEGUNDOS)} MINUTOS
           </div>
           <button onClick={onIniciar} style={{
             width: "100%", padding: "0.85rem", background: "transparent", color: "#29FF14", border: "1px solid #29FF14",
