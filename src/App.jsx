@@ -38,7 +38,7 @@ const fases = [
     id: 2,
     titulo: "ETAPA 2: REGREDIR PARA DEPOIS AVANÇAR",
     enigma:
-      "Tentei fugir, mas não conseguir. Então tentei me esconder na piscina. ",
+      "Tentei fugir, mas não consegui. Então tentei me esconder na piscina. ",
     infoExtra: "Dica: O espectro visível segue uma ordem específica de temperaturas de cor.",
     instrucao: "Insira aqui sua resposta",
     respostaCorreta: "verde",
